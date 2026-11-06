@@ -1,13 +1,21 @@
 # PayPilot — the AI first mate for small merchants on PayPal
 
 ![CI](https://img.shields.io/badge/CI-github%20actions-2088FF?logo=githubactions&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-49%20green-brightgreen)
+![Tests](https://img.shields.io/badge/tests-50%20green-brightgreen)
 ![Node](https://img.shields.io/badge/node-%E2%89%A520-339933?logo=nodedotjs&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-0da49e)
 
 ![hero](screenshots/dashboard.png)
 
-> **[`screenshots/`]** Hero image / GIF placeholder — see `screenshots/README.md` for the shot list before submitting.
+**First Mate proposes, a human approves:** natural-language invoice → approval card → executed & audited.
+
+![approval](screenshots/first-mate-approval.png)
+
+The ledger in AG Grid (quick filter + AI risk/category columns) and the invoice book:
+
+| Transactions (AG Grid) | Invoices |
+|---|---|
+| ![grid](screenshots/transactions-grid.png) | ![invoices](screenshots/invoices.png) |
 
 Small merchants on PayPal drown in their own ledger: disputes expire unnoticed, refunds quietly spike, one customer quietly becomes a third of revenue, and "will I be fine next month?" has no answer. PayPilot is an **agentic back office** that watches the account, surfaces money problems with real math, explains them in plain language — and, **only with your explicit approval**, takes actions like creating and sending invoices.
 

@@ -97,7 +97,7 @@ function Topbar({ meta }: { meta: AppMeta | null }) {
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-500" />
           AI {meta?.aiProvider ?? '…'}
         </span>
-        <button onClick={() => setOpen(true)} className="pp-btn-accent">
+        <button onClick={() => setOpen(true)} className="pp-btn-accent" data-testid="first-mate-toggle">
           <MessageCircle size={16} />
           First Mate
         </button>

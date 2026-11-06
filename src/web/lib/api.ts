@@ -33,9 +33,11 @@ export interface OverviewResponse {
 }
 
 async function api<T>(path: string, init?: RequestInit): Promise<T> {
+  // Only send Content-Type when a body follows — Fastify rejects an empty
+  // JSON body (400) if the header is set on bodyless POSTs.
   const res = await fetch(path, {
-    headers: { 'Content-Type': 'application/json' },
     ...init,
+    headers: init?.body != null ? { 'Content-Type': 'application/json' } : undefined,
   });
   if (!res.ok) {
     const body = (await res.json().catch(() => null)) as { error?: string } | null;

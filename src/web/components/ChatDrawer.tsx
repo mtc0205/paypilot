@@ -92,6 +92,7 @@ function ApprovalCard({ card }: { card: ApprovalCardData }) {
           <button
             className="pp-btn-accent flex-1 py-1.5"
             disabled={busy}
+            data-testid="approve-btn"
             onClick={async () => {
               setBusy(true);
               await decide(card.approvalId, 'approve');
@@ -104,6 +105,7 @@ function ApprovalCard({ card }: { card: ApprovalCardData }) {
           <button
             className="pp-btn-ghost flex-1 py-1.5"
             disabled={busy}
+            data-testid="reject-btn"
             onClick={async () => {
               setBusy(true);
               await decide(card.approvalId, 'reject');
@@ -234,6 +236,7 @@ export function ChatDrawer({ aiProvider }: { aiProvider: string }) {
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
+              data-testid="chat-input"
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault();

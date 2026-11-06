@@ -51,6 +51,19 @@ describe('mock AI provider — deterministic, insight-driven answers', () => {
     expect(Number((summary?.result as { net: number }).net)).toBeGreaterThan(0);
   });
 
+  it('"why did refunds spike last week?" routes to the anomaly feed, not a random transaction explain', async () => {
+    const { ctx } = fixture();
+    const events = await run('why did refunds spike last week?', ctx);
+    const calls = events.filter((e) => e.type === 'tool_call').map((e) => (e as { tool: string }).tool);
+    expect(calls).toContain('detect_anomalies');
+    expect(calls).not.toContain('explain_transaction');
+
+    const text = textOf(events).toLowerCase();
+    // leads with the refund-rate alert, quoting its real numbers
+    expect(text).toMatch(/refund/);
+    expect(text).toMatch(/critical/);
+  });
+
   it('the demo invoice prompt produces an approval-gated create_invoice call', async () => {
     const { store, ctx } = fixture();
     const events = await run('Invoice Acme $420 for consulting, due in 14 days', ctx);

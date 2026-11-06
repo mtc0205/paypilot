@@ -177,6 +177,7 @@ export function TransactionsPage() {
             onChange={(e) => onQuickFilter(e.target.value)}
             placeholder="Quick filter — try “northwind”, “refund”, “card”…"
             className="pp-input pl-9"
+            data-testid="quick-filter"
           />
         </div>
       </div>

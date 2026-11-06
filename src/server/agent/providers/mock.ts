@@ -17,6 +17,7 @@ interface IntentResult {
     | 'overview'
     | 'disputes'
     | 'forecast'
+    | 'anomalies'
     | 'search'
     | 'explain'
     | 'greeting';
@@ -65,11 +66,21 @@ export function detectIntent(message: string, ctx: ToolContext): IntentResult {
     return { kind: 'disputes', disputeId: idMatch?.[0]?.toUpperCase() };
   }
 
-  if (/explain|why did|what is txn_|tell me about/.test(lower)) {
+  if (/explain|tell me about/.test(lower)) {
     const idMatch = message.match(/txn_\d+/i);
     if (idMatch) return { kind: 'explain', transactionId: idMatch[0] };
     const risky = ctx.store.snapshot.transactions.find((t) => t.risk.score >= 55);
     if (risky) return { kind: 'explain', transactionId: risky.id };
+  }
+
+  // Anomaly / problem questions: route to the insight engine's alert feed, not
+  // to a single-transaction explanation ("why did refunds spike last week?").
+  if (
+    /refund|spike|anomal|alert|fraud|card.?test|unusual|suspicious|attack|outlier|what('s| is) wrong|anything (wrong|off)|problems?/.test(
+      lower,
+    )
+  ) {
+    return { kind: 'anomalies' };
   }
 
   if (/forecast|predict|projection|next (30|14|60) days?|next month|cash ?flow ahead|outlook/.test(lower)) {
@@ -188,6 +199,40 @@ async function narrateOverview(deps: AgentDeps): Promise<void> {
   await streamText(deps, lines.join('\n\n'));
 }
 
+async function narrateAnomalies(deps: AgentDeps, message: string): Promise<void> {
+  const r = await deps.callTool('detect_anomalies', { scope: 'all' });
+  if (r.status !== 'ok' || !r.result) {
+    await streamText(deps, 'Could not load the alert feed right now.');
+    return;
+  }
+  const d = r.result.data as AnomalyData;
+  if (d.alerts.length === 0) {
+    await streamText(deps, 'The insight engine has nothing flagged right now — quiet seas.');
+    return;
+  }
+  // If the merchant asked about a specific kind of problem (e.g. refunds),
+  // lead with the matching alert instead of the feed order.
+  const wants = /refund/.test(message)
+    ? /refund/i
+    : /card.?test|fraud|attack/.test(message)
+      ? /card.?testing|fraud/i
+      : null;
+  const ordered = wants
+    ? [...d.alerts].sort((a, b) => Number(wants.test(b.title) || wants.test(b.detail)) - Number(wants.test(a.title) || wants.test(a.detail)))
+    : d.alerts;
+  const top = ordered.slice(0, 3);
+  const lines = [
+    `${d.total} insight${d.total === 1 ? '' : 's'} on file (${d.critical} critical). ${wants ? 'Starting with what you asked about:' : 'Most urgent first:'}`,
+  ];
+  for (const a of top) {
+    lines.push(`• ${a.title} — ${firstSentence(a.detail)}`);
+  }
+  lines.push(
+    'These come from the deterministic engine (median-based z-scores and velocity checks), so every number is reproducible. Want me to explain a linked transaction, or draft a dispute response?',
+  );
+  await streamText(deps, lines.join('\n'));
+}
+
 async function narrateForecast(deps: AgentDeps, result: { status: string; result?: ToolResult } ): Promise<void> {
   if (result.status !== 'ok' || !result.result) {
     await streamText(deps, "I couldn't build a forecast — the engine needs at least 14 days of history.");
@@ -297,7 +342,7 @@ async function narrateGreeting(deps: AgentDeps, ctx: ToolContext): Promise<void>
   await streamText(
     deps,
     `Ahoy — I'm First Mate, your PayPilot copilot. I'm watching ${txs} ledger transactions, your invoices, and any disputes.\n\n` +
-      `Try: "what's happening with my money", "invoice Acme $420 for consulting, due in 14 days", "any disputes needing attention?", or "forecast next 30 days".`,
+      `Try: "what's happening with my money", "why did refunds spike last week?", "invoice Acme $420 for consulting, due in 14 days", or "forecast next 30 days".`,
   );
 }
 
@@ -321,6 +366,9 @@ export async function mockRespond(req: AgentRequest, deps: AgentDeps, ctx: ToolC
     }
     case 'forecast':
       await narrateForecast(deps, await deps.callTool('forecast_cashflow', intent.args ?? { days: 30 }));
+      return;
+    case 'anomalies':
+      await narrateAnomalies(deps, req.message);
       return;
     case 'search':
       await narrateSearch(deps, intent.query ?? null);

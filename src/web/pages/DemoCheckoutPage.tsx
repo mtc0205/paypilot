@@ -105,6 +105,7 @@ export function DemoCheckoutPage() {
               {stage === 'form' && (
                 <button
                   className="pp-btn-primary"
+                  data-testid="create-order-btn"
                   disabled={busy || !item.trim() || !(Number(amount) > 0)}
                   onClick={() => void run(() => createDemoOrder(item.trim(), Number(amount)), 'created')}
                 >
@@ -113,13 +114,13 @@ export function DemoCheckoutPage() {
                 </button>
               )}
               {stage === 'created' && (
-                <button className="pp-btn-primary" disabled={busy} onClick={() => void run(() => approveDemoOrder(order!.id), 'approved')}>
+                <button className="pp-btn-primary" data-testid="approve-order-btn" disabled={busy} onClick={() => void run(() => approveDemoOrder(order!.id), 'approved')}>
                   {busy ? <Loader2 size={15} className="animate-spin" /> : <CreditCard size={15} />}
                   Simulate buyer approval
                 </button>
               )}
               {stage === 'approved' && (
-                <button className="pp-btn-accent" disabled={busy} onClick={() => void run(() => captureDemoOrder(order!.id), 'captured')}>
+                <button className="pp-btn-accent" data-testid="capture-order-btn" disabled={busy} onClick={() => void run(() => captureDemoOrder(order!.id), 'captured')}>
                   {busy ? <Loader2 size={15} className="animate-spin" /> : <CheckCircle2 size={15} />}
                   Capture payment
                 </button>
