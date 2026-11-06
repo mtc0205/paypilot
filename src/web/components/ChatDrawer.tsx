@@ -8,7 +8,6 @@ import {
   ShieldAlert,
   Sparkles,
   Terminal,
-  User,
   Wrench,
   X,
 } from 'lucide-react';

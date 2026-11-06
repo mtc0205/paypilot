@@ -76,7 +76,7 @@ export function detectIntent(message: string, ctx: ToolContext): IntentResult {
     return { kind: 'forecast', args: { days: 30 } };
   }
 
-  if (/how many|who (paid|is|pays)|find |search|show me|spent|paid me|largest|biggest|top customer|from \w+/.test(lower)) {
+  if (/how many|who (paid|is|pays)|find |search|show me|spent|paid me|largest|biggest|top customer|what did|did .+ (pay|buy)|from \w+/.test(lower)) {
     return { kind: 'search', query: extractQuery(message) };
   }
 
@@ -203,7 +203,7 @@ async function narrateForecast(deps: AgentDeps, result: { status: string; result
   );
 }
 
-async function narrateDisputes(deps: AgentDeps, disputeId: string | undefined): Promise<void> {
+async function narrateDisputes(deps: AgentDeps, disputeId: string | undefined): Promise<string | undefined> {
   const listR = await deps.callTool('list_disputes', {});
   if (listR.status !== 'ok' || !listR.result) {
     await streamText(deps, 'Could not load disputes right now.');
@@ -212,7 +212,7 @@ async function narrateDisputes(deps: AgentDeps, disputeId: string | undefined): 
   const d = listR.result.data as DisputeData;
   if (d.disputes.length === 0) {
     await streamText(deps, 'No open disputes — nothing needs your attention there.');
-    return;
+    return undefined;
   }
   const lines = [
     `You have ${d.disputes.length} open dispute${d.disputes.length === 1 ? '' : 's'} with ${fmtMoney(d.exposure)} at stake:`,
@@ -226,6 +226,7 @@ async function narrateDisputes(deps: AgentDeps, disputeId: string | undefined): 
   const target = disputeId ?? d.disputes[0]?.id;
   lines.push(`Want me to draft the response to ${target}? I'll pull the linked transaction and evidence checklist — drafting needs no approval, submitting to PayPal stays 100% in your hands.`);
   await streamText(deps, lines.join('\n'));
+  return target;
 }
 
 async function narrateSearch(deps: AgentDeps, query: string | null): Promise<void> {
@@ -311,12 +312,13 @@ export async function mockRespond(req: AgentRequest, deps: AgentDeps, ctx: ToolC
     case 'send_invoice':
       await narrateSendInvoice(deps, intent.args ?? {});
       return;
-    case 'disputes':
-      await narrateDisputes(deps, intent.disputeId);
-      if (/\bdraft\b/i.test(req.message) && intent.disputeId) {
-        await deps.callTool('draft_dispute_response', { dispute_id: intent.disputeId });
+    case 'disputes': {
+      const target = await narrateDisputes(deps, intent.disputeId);
+      if (/\bdraft\b/i.test(req.message) && target) {
+        await deps.callTool('draft_dispute_response', { dispute_id: target });
       }
       return;
+    }
     case 'forecast':
       await narrateForecast(deps, await deps.callTool('forecast_cashflow', intent.args ?? { days: 30 }));
       return;

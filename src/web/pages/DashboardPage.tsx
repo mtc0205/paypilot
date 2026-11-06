@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { AlertTriangle, ArrowDownRight, ArrowUpRight, Banknote, CalendarClock, Scale, Users } from 'lucide-react';
 import type { InsightAlert } from '@shared/types';
 import { getOverview, type OverviewResponse } from '../lib/api';
-import { money, pct, timeAgo } from '../lib/format';
+import { money, pct } from '../lib/format';
 import { AlertIcon, EmptyState, KpiCard, Panel, SeverityDot, SkeletonCard } from '../components/ui';
 import { CashflowChart } from '../components/CashflowChart';
 import { useChatStore } from '../state/chat';

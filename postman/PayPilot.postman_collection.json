@@ -1,0 +1,101 @@
+{
+  "info": {
+    "name": "PayPilot",
+    "description": "PayPilot — the AI first mate for small merchants on PayPal. Main REST endpoints. Run against a local server: `npm start` (default http://localhost:5075, zero env vars needed).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5075" }
+  ],
+  "item": [
+    {
+      "name": "Health & meta",
+      "item": [
+        { "name": "Health", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/health", "host": ["{{baseUrl}}"], "path": ["api", "health"] } } },
+        { "name": "Meta (modes & counts)", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/meta", "host": ["{{baseUrl}}"], "path": ["api", "meta"] } } }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Overview (KPIs, series, forecast, alerts)",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/overview", "host": ["{{baseUrl}}"], "path": ["api", "overview"] } }
+        }
+      ]
+    },
+    {
+      "name": "Transactions",
+      "item": [
+        {
+          "name": "List (filters: q,type,status,direction,min,max,lastDays,limit)",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/transactions?lastDays=30&limit=5", "host": ["{{baseUrl}}"], "path": ["api", "transactions"], "query": [{ "key": "lastDays", "value": "30" }, { "key": "limit", "value": "5" }] } }
+        },
+        {
+          "name": "Get by id",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/transactions/txn_00001", "host": ["{{baseUrl}}"], "path": ["api", "transactions", "txn_00001"] } }
+        },
+        {
+          "name": "Explain (deterministic insight engine)",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/transactions/txn_00001/explain", "host": ["{{baseUrl}}"], "path": ["api", "transactions", "txn_00001", "explain"] } }
+        }
+      ]
+    },
+    {
+      "name": "Disputes",
+      "item": [
+        { "name": "List", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/disputes", "host": ["{{baseUrl}}"], "path": ["api", "disputes"] } } },
+        { "name": "AI-draft response", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "url": { "raw": "{{baseUrl}}/api/disputes/PP-D-9100/draft", "host": ["{{baseUrl}}"], "path": ["api", "disputes", "PP-D-9100", "draft"] } } },
+        { "name": "Toggle evidence item", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"index\": 0,\n  \"done\": true\n}" }, "url": { "raw": "{{baseUrl}}/api/disputes/PP-D-9100/evidence", "host": ["{{baseUrl}}"], "path": ["api", "disputes", "PP-D-9100", "evidence"] } } }
+      ]
+    },
+    {
+      "name": "Invoices",
+      "item": [
+        { "name": "List", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/invoices", "host": ["{{baseUrl}}"], "path": ["api", "invoices"] } } },
+        {
+          "name": "Parse natural language",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"text\": \"Invoice Acme $420 for consulting, due in 14 days\"\n}" }, "url": { "raw": "{{baseUrl}}/api/invoice/parse", "host": ["{{baseUrl}}"], "path": ["api", "invoice", "parse"] } }
+        },
+        {
+          "name": "Create (human-initiated)",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"recipientName\": \"Acme Corp\",\n  \"item\": \"Consulting\",\n  \"amount\": 420,\n  \"dueDays\": 14,\n  \"memo\": \"consulting\"\n}" }, "url": { "raw": "{{baseUrl}}/api/invoices", "host": ["{{baseUrl}}"], "path": ["api", "invoices"] } }
+        },
+        { "name": "Send", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/api/invoices/INV-2026101/send", "host": ["{{baseUrl}}"], "path": ["api", "invoices", "INV-2026101", "send"] } } },
+        { "name": "Mark paid", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/api/invoices/INV-2026101/mark-paid", "host": ["{{baseUrl}}"], "path": ["api", "invoices", "INV-2026101", "mark-paid"] } } }
+      ]
+    },
+    {
+      "name": "Demo checkout (Orders API v2 flow)",
+      "item": [
+        { "name": "Create order", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"item\": \"PayPilot demo mug\",\n  \"amount\": 19.99\n}" }, "url": { "raw": "{{baseUrl}}/api/demo/order", "host": ["{{baseUrl}}"], "path": ["api", "demo", "order"] } } },
+        { "name": "Buyer approves (mock only)", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/api/demo/order/:id/approve", "host": ["{{baseUrl}}"], "path": ["api", "demo", "order", ":id", "approve"], "variable": [{ "key": "id", "value": "PASTE_ORDER_ID" }] } } },
+        { "name": "Capture", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/api/demo/order/:id/capture", "host": ["{{baseUrl}}"], "path": ["api", "demo", "order", ":id", "capture"], "variable": [{ "key": "id", "value": "PASTE_ORDER_ID" }] } } }
+      ]
+    },
+    {
+      "name": "Agent (First Mate)",
+      "item": [
+        {
+          "name": "Chat — non-streaming (all SSE events)",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"message\": \"What's happening with my money?\"\n}" }, "url": { "raw": "{{baseUrl}}/api/chat/message", "host": ["{{baseUrl}}"], "path": ["api", "chat", "message"] } }
+        },
+        {
+          "name": "Chat — SSE stream (token/tool_call/tool_result/approval_request/done)",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "text/event-stream" }], "body": { "mode": "raw", "raw": "{\n  \"message\": \"Invoice Acme $420 for consulting, due in 14 days\"\n}" }, "url": { "raw": "{{baseUrl}}/api/chat/stream", "host": ["{{baseUrl}}"], "path": ["api", "chat", "stream"] } }
+        },
+        { "name": "Approvals — list", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/approvals", "host": ["{{baseUrl}}"], "path": ["api", "approvals"] } } },
+        {
+          "name": "Approvals — decide (executes the tool)",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"decision\": \"approve\",\n  \"by\": \"merchant\"\n}" }, "url": { "raw": "{{baseUrl}}/api/approvals/:id/decide", "host": ["{{baseUrl}}"], "path": ["api", "approvals", ":id", "decide"], "variable": [{ "key": "id", "value": "PASTE_APPROVAL_ID" }] } }
+        }
+      ]
+    },
+    {
+      "name": "Audit log",
+      "item": [
+        { "name": "List (limit, actor)", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/audit?limit=50", "host": ["{{baseUrl}}"], "path": ["api", "audit"], "query": [{ "key": "limit", "value": "50" }] } } }
+      ]
+    }
+  ]
+}

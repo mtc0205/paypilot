@@ -42,7 +42,8 @@ function parseDueDays(text: string): { days: number | null; explicit: boolean } 
   if (explicitDays) return { days: Number(explicitDays[1]), explicit: true };
   if (/\b(due )?(today|right now)\b/.test(lower)) return { days: 0, explicit: true };
   if (/due tomorrow|next day/.test(lower)) return { days: 1, explicit: true };
-  if (/\b(two|2|a) weeks?\b|next week|fortnight/.test(lower) && /due|net/.test(lower)) return { days: 14, explicit: true };
+  if (/\bnext week\b/.test(lower) && /due|net/.test(lower)) return { days: 7, explicit: true };
+  if (/\b(two|2|a) weeks?\b|fortnight/.test(lower) && /due|net/.test(lower)) return { days: 14, explicit: true };
   if (/\b(three|3) weeks?\b/.test(lower) && /due|net/.test(lower)) return { days: 21, explicit: true };
   if (/a month|next month|monthly terms|net[- ]?30/.test(lower)) return { days: 30, explicit: true };
   const net = lower.match(/net[- ]?(\d+)/);
@@ -62,9 +63,9 @@ function parseDueDays(text: string): { days: number | null; explicit: boolean } 
 
 function parseAmount(text: string): number | null {
   // Prefer explicit currency: $1,234.56 / $420 / 250 dollars
-  const dollar = text.match(/\$\s?(\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?|\d+(?:\.\d{1,2})?)/);
+  const dollar = text.match(/\$\s?(\d{1,3}(?:,\d{3})+(?:\.\d{1,2})?|\d+(?:\.\d{1,2})?)(?!\d)/);
   if (dollar) return Number(dollar[1].replace(/,/g, ''));
-  const worded = text.match(/(\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?)\s*(?:dollars?|usd)/i);
+  const worded = text.match(/(\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?)\s*(?:dollars?|usd)\b/i);
   if (worded) return Number(worded[1].replace(/,/g, ''));
   // Bare number after "for" ("bill Tom for 500")
   const forNumber = text.match(/\bfor\s+\$?(\d+(?:\.\d{1,2})?)\b/);

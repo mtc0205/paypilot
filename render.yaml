@@ -1,0 +1,32 @@
+# One-click deploy to Render (eligible for the Render sponsor prize).
+services:
+  - type: web
+    name: paypilot
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run build
+    startCommand: node dist-server/src/server/index.js
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      # Zero-config demo mode — flip to sandbox + add creds to go live.
+      - key: PAYPAL_ENV
+        value: mock
+      - key: AI_PROVIDER
+        value: mock
+      - key: PAYPAL_CLIENT_ID
+        sync: false
+      - key: PAYPAL_CLIENT_SECRET
+        sync: false
+      - key: PAYPAL_MERCHANT_EMAIL
+        sync: false
+      - key: AI_API_KEY
+        sync: false
+      - key: AI_BASE_URL
+        sync: false
+      - key: AI_MODEL
+        sync: false
