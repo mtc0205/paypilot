@@ -4,7 +4,7 @@
  * Writes are mirrored into the local store so the audit log and UI stay coherent.
  */
 import type { DemoOrder, Dispute, Invoice, Transaction } from '../../shared/types.js';
-import { dateKey, round2, uid } from '../../shared/util.js';
+import { round2, uid } from '../../shared/util.js';
 import type { Store } from '../store/store.js';
 import { PayPalClient } from './client.js';
 import type { InvoiceDraftInput, OrderInput, PayPalProvider } from './provider.js';
@@ -143,5 +143,3 @@ export class SandboxProvider implements PayPalProvider {
     return captured;
   }
 }
-
-export const _dateKey = dateKey;

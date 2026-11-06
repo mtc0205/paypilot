@@ -3,7 +3,7 @@
  * bounded by construction; every point is explainable via the returned flags.
  */
 import type { RiskAssessment, Transaction } from '../../shared/types.js';
-import { clamp, round2 } from '../../shared/util.js';
+import { clamp } from '../../shared/util.js';
 
 export interface RiskContext {
   /** Disputes previously filed by this buyer */
@@ -49,5 +49,3 @@ export function riskBand(score: number): 'low' | 'medium' | 'high' {
 export function riskScoreNumber(tx: Pick<Transaction, 'type' | 'status' | 'method' | 'amount' | 'counterparty'>, ctx?: RiskContext): number {
   return scoreRisk(tx, ctx).score;
 }
-
-export const _round2 = round2; // re-exported for convenience in downstream summaries
