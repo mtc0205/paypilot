@@ -49,7 +49,7 @@ export class MockPayPalProvider implements PayPalProvider {
         dueDate: dateKey(new Date(Date.now() + (input.dueDays ?? 30) * 86_400_000)),
         memo: input.memo,
         createdAt: new Date().toISOString(),
-        createdBy: 'human',
+        createdBy: input.createdBy ?? 'human',
       };
       s.invoices.unshift(invoice);
       created = invoice;

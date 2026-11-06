@@ -53,7 +53,7 @@ export class SandboxProvider implements PayPalProvider {
   async createInvoice(input: InvoiceDraftInput): Promise<Invoice> {
     const payload = toInvoicePayload(input, this.config.merchantEmail);
     const res = await createInvoiceRemote(this.client, payload);
-    const invoice = { ...fromPayPalInvoice(res), createdBy: 'human' as const };
+    const invoice = { ...fromPayPalInvoice(res), createdBy: input.createdBy ?? ('human' as const) };
     this.store.update((s) => {
       s.invoices.unshift(invoice);
     });

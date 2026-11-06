@@ -4,6 +4,7 @@
     "outDir": "dist-server",
     "rootDir": ".",
     "sourceMap": false,
+    "noEmit": false,
     "types": ["node"]
   },
   "include": ["src/server/**/*.ts", "src/shared/**/*.ts", "scripts/**/*.ts"]

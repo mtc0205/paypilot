@@ -264,6 +264,7 @@ const createInvoice: ToolDef = {
       quantity: args.quantity ? Number(args.quantity) : 1,
       dueDays: args.dueDays !== undefined ? Number(args.dueDays) : 30,
       memo: args.memo ? String(args.memo) : undefined,
+      createdBy: 'agent',
     });
     return {
       summary: `Invoice ${invoice.number} created (DRAFT) — ${fmtMoney(invoice.total)} to ${invoice.recipient.name}, due ${invoice.dueDate}.`,

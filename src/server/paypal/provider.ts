@@ -13,6 +13,8 @@ export interface InvoiceDraftInput {
   quantity?: number;
   dueDays?: number;
   memo?: string;
+  /** Who initiated: the human composer UI or the agent (after approval). */
+  createdBy?: 'human' | 'agent';
 }
 
 export interface OrderInput {
