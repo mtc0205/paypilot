@@ -29,6 +29,10 @@ Small merchants on PayPal drown in their own ledger: disputes expire unnoticed, 
 
 ## Quickstart (3 commands)
 
+Prefer a hosted copy? One click — free Render plan, mock mode, zero credentials:
+
+[![Deploy to Render](https://render.com/images/deploy-button.svg)](https://render.com/deploy?repo=https://github.com/mtc0205/paypilot)
+
 ```bash
 npm install
 npm run build
